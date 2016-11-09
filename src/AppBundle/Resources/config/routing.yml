@@ -1,0 +1,11 @@
+album_list:
+    path: /albums
+    defaults: { _controller: AppBundle:Album:AlbumList, _format: json }
+
+
+album_images:
+    path: /album/{albumId}
+    defaults: { _controller: AppBundle:Images:AlbumImages, _format: json }
+    requirements:
+        _method: GET
+        albumId: "\d+"

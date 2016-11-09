@@ -1,0 +1,32 @@
+.album,
+.image {
+	margin-bottom: 20px;
+	box-shadow: 0 0 10px #ccc;
+	border-radius: 3px;
+	display: inline-block;
+	overflow: hidden;
+	line-height: 0;
+
+	img {
+	    max-height: 100%;
+	}
+
+	a.name {
+		display: block;
+		color: #000;
+		text-decoration: none;
+		padding: 10px 20px;
+		
+		font-size: 14px;
+		font-weight: 400;
+		font-family: "Helvetica Neue", "Open Sans", "Arial", sans-serif;
+
+		text-align: center;
+		line-height: 22px;
+	}
+}
+
+.no_content {
+	text-align: center;
+	width: 100%;
+}

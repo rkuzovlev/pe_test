@@ -64,3 +64,36 @@ swiftmailer:
     username:  "%mailer_user%"
     password:  "%mailer_password%"
     spool:     { type: memory }
+
+
+fos_rest:
+    # switch the response format based on the request format headers
+    format_listener: true
+    # return json by default
+    routing_loader:
+        default_format: json
+    # configure the available response formats        
+    view:
+        formats:
+            json: true
+            xml: true
+            rss: false
+        # force the serialization of controller return values into a Response
+        view_response_listener: force
+    # deserialize the request body
+    body_listener: true
+    param_fetcher_listener: force
+    # restrict allowed methods for controller actions
+    allowed_methods_listener: true
+
+
+# knp_paginator:
+#     page_range: 5                      # default page range used in pagination control
+#     default_options:
+#         page_name: page                # page query parameter name
+#         sort_field_name: sort          # sort field query parameter name
+#         sort_direction_name: direction # sort direction query parameter name
+#         distinct: true                 # ensure distinct results, useful when ORM queries are using GROUP BY statements
+#     template:
+#         pagination: KnpPaginatorBundle:Pagination:sliding.html.twig     # sliding pagination controls template
+#         sortable: KnpPaginatorBundle:Pagination:sortable_link.html.twig # sort link template

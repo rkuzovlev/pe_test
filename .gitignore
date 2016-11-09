@@ -10,3 +10,7 @@
 /vendor/
 /bin/
 /composer.phar
+node_modules
+*.log
+.DS_Store
+coverage

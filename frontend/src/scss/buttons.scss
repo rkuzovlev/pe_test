@@ -1,0 +1,40 @@
+button {
+	background: none;
+	border: none;
+	border-radius: 3px;
+	
+	padding: 0px 12px;
+	margin: 10px;
+
+	outline: none;
+    cursor: pointer;
+	
+	font-size: 14px;
+    font-weight: 400;
+    line-height: 31px;
+	
+	transition: color 0.2s linear, border-color 0.2s linear, background-color 0.2s linear;
+
+	&.btn-def {
+		border: 1px #aaa solid;
+		color: #000;
+		
+		&:hover,
+		&:focus {
+			color: #0084ff;
+			border-color: #0084ff;
+		}
+	}
+
+	&.btn-main {
+		border: 1px #0084ff solid;
+		background-color: #0084ff;
+		color: #fff;
+		
+		&:hover,
+		&:focus {
+			border-color: #005cb2;
+			background-color: #005cb2;
+		}
+	}
+}
