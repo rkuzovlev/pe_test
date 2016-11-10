@@ -1,11 +1,25 @@
 album_list:
     path: /albums
     defaults: { _controller: AppBundle:Album:AlbumList, _format: json }
+    requirements:
+      _method: GET
 
+create_album:
+    path: /albums
+    defaults: { _controller: AppBundle:Album:CreateAlbum, _format: json }
+    requirements:
+      _method: POST
 
 album_images:
     path: /album/{albumId}
     defaults: { _controller: AppBundle:Images:AlbumImages, _format: json }
     requirements:
         _method: GET
+        albumId: "\d+"
+
+album_images_upload:
+    path: /album/{albumId}
+    defaults: { _controller: AppBundle:Images:UploadAlbumImages, _format: json }
+    requirements:
+        _method: POST
         albumId: "\d+"

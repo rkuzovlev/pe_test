@@ -9,6 +9,9 @@ Album = Marionette.View.extend
 	ui:
 		albumLink: 'a.name'
 
+	modelEvents:
+		'sync': 'render'
+
 	events:
 		'click @ui.albumLink': 'openAlbum'
 

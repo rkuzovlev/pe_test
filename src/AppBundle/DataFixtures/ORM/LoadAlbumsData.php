@@ -10,26 +10,27 @@ class LoadAlbumsData implements FixtureInterface
     public function load(ObjectManager $em)
     {
         $dogs = new Album();
+        $dogs->setSrc('http://magazine.foxnews.com/sites/magazine.foxnews.com/files/styles/700_image/public/petfeather_0.jpg');
         $dogs->setName('Dogs');
             
         $dog1 = new Image();
-        $dog1->setSrc('1.jpg');
+        $dog1->setSrc('http://magazine.foxnews.com/sites/magazine.foxnews.com/files/styles/700_image/public/petfeather_0.jpg');
         $dog1->setAlbum($dogs);
 
         $dog2 = new Image();
-        $dog2->setSrc('2.jpg');
+        $dog2->setSrc('http://www.warriors.myewebsite.com/img/mid/19/spottedleaf.jpg');
         $dog2->setAlbum($dogs);
 
         $dog3 = new Image();
-        $dog3->setSrc('3.jpg');
+        $dog3->setSrc('https://s-media-cache-ak0.pinimg.com/564x/a2/e2/9f/a2e29fb5d8c48a072426326a50f90f5b.jpg');
         $dog3->setAlbum($dogs);
 
         $dog4 = new Image();
-        $dog4->setSrc('4.jpg');
+        $dog4->setSrc('https://s-media-cache-ak0.pinimg.com/736x/3b/d4/9b/3bd49b61a30cf6dad75226501d2d2266.jpg');
         $dog4->setAlbum($dogs);
 
         $dog5 = new Image();
-        $dog5->setSrc('5.jpg');
+        $dog5->setSrc('http://m5.paperblog.com/i/46/462574/dogs-and-music-a-harmonious-pair-L-Ctjc8z.jpeg');
         $dog5->setAlbum($dogs);
 
         $dogs->addImage($dog1)
@@ -44,6 +45,13 @@ class LoadAlbumsData implements FixtureInterface
         $em->persist($dog3);
         $em->persist($dog4);
         $em->persist($dog5);
+
+
+        $cats = new Album();
+        $cats->setSrc('https://s-media-cache-ak0.pinimg.com/736x/3b/d4/9b/3bd49b61a30cf6dad75226501d2d2266.jpg');
+        $cats->setName('cats');
+
+        $em->persist($cats);
 
         $em->flush();
     }

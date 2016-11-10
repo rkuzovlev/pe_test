@@ -15,7 +15,12 @@ PayeverApp = Marionette.Application.extend
 		@ac = new AlbumRouter.controller layout: layout
 		@ar = new AlbumRouter.router controller: @ac
 
-		Backbone.history.start pushState: true
+		# support dev env, not fully suported yet :(
+		root = '/'
+		if window.location.pathname.indexOf('/app_dev.php') == 0
+			root = "/app_dev.php"
+
+		Backbone.history.start pushState: true, root: root
 
 
 module.exports = new PayeverApp()

@@ -4,6 +4,11 @@ parameters:
 #    parameter_name: value
 
 services:
-#    service_name:
-#        class: AppBundle\Directory\ClassName
-#        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
+  ImageUploader:
+    class: AppBundle\Services\ImageUploader
+    arguments: [ @kernel ]
+    # arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
+
+  AlbumService:
+    class: AppBundle\Services\AlbumService
+    arguments: [ @ImageUploader, @doctrine ]

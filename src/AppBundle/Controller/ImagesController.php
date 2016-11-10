@@ -17,4 +17,20 @@ class ImagesController extends FOSRestController
 					->getRepository('AppBundle:Image')
 	        		->findBy(array('album' => $albumId));
     }
+
+    /**
+     * @Rest\View(serializerGroups={"list"})
+     */
+    public function UploadAlbumImagesAction($albumId)
+    {
+    	$album = $this->getDoctrine()
+					->getRepository('AppBundle:Album')
+		    		->findOneById($albumId);
+
+    	$imageFile = $this->getRequest()->files->get('image');
+
+    	$image = $this->get('AlbumService')->uploadImage($imageFile, $album);
+    	
+    	return $image;
+    }
 }
