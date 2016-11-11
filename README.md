@@ -1,4 +1,1 @@
-.
-=
-
-A Symfony project created on November 5, 2016, 1:53 pm.
+You can install this automaticaly via vagrant by [pe_vagrant](https://github.com/rkuzovlev/pe_vagrant)
