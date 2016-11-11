@@ -18,9 +18,7 @@ class AlbumController extends FOSRestController
      */
     public function AlbumListAction()
     {
-    	return $this->getDoctrine()
-					->getRepository('AppBundle:Album')
-	        		->findAll();
+        return $this->get('AlbumService')->getAlbums();
     }
 
     /**

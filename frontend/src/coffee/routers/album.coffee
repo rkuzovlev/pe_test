@@ -34,22 +34,27 @@ AlbumController = Marionette.Object.extend
 	initialize: (options)->
 		@layout = options.layout;
 		
-		@albumList = new AlbumListCollection()
-		@imageList = new ImageCollection()
+		# prefetch - prefetched data from server on first request.
+		# 			 look at twig index template, prefetch twig extension and Default controllers
+		@albumList = new AlbumListCollection prefetch.albums
+		@imageList = new ImageCollection prefetch.album_images
 
 	listAlbums: ()->
 		@layout.showChildView 'controls', new AlbumListControlsView()
 		@layout.showChildView 'content', new AlbumListCollectionView(collection: @albumList)
+		@layout.hidePagination()
 
 		@albumList.fetch()
 
 	showAlbum: (albumId, page)->
-		@albumId = albumId
-		@page = page
+		page = parseInt page
+		@albumId = parseInt albumId
+		@page = if page then page else 1
 
 		url = '/api/album/' + albumId
-		url += '/page/' + page if page		
+		url += '/page/' + page if page
 
+		@layout.showAlbumPagination albumId, @page
 		@layout.showChildView 'controls', new ImageControlsView()
 		@layout.showChildView 'content', new ImageCollectionView(collection: @imageList)
 
@@ -59,6 +64,7 @@ AlbumController = Marionette.Object.extend
 
 
 	default: ()->
+		@layout.hidePagination()
 		@layout.detachChildView 'content'
 		@layout.showChildView 'controls', new ErrorPage page: 404
 		

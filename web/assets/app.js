@@ -18489,9 +18489,16 @@ AlbumRouter = require('./routers/album');
 Layout = require('./views/layout');
 
 PayeverApp = Marionette.Application.extend({
-  region: "#content",
+  region: '#content',
+  channelName: 'notify',
+  radioRequests: {
+    'get:root': 'getRoot'
+  },
+  getRoot: function() {
+    return this.root;
+  },
   onStart: function() {
-    var layout, main, root;
+    var layout, main;
     layout = new Layout();
     main = this.getRegion();
     main.show(layout);
@@ -18501,13 +18508,13 @@ PayeverApp = Marionette.Application.extend({
     this.ar = new AlbumRouter.router({
       controller: this.ac
     });
-    root = '/';
+    this.root = '/';
     if (window.location.pathname.indexOf('/app_dev.php') === 0) {
-      root = "/app_dev.php";
+      this.root = "/app_dev.php";
     }
     return Backbone.history.start({
       pushState: true,
-      root: root
+      root: this.root
     });
   }
 });
@@ -18515,7 +18522,7 @@ PayeverApp = Marionette.Application.extend({
 module.exports = new PayeverApp();
 
 
-},{"./routers/album":31,"./views/layout":48,"backbone":3,"backbone.marionette":1}],26:[function(require,module,exports){
+},{"./routers/album":31,"./views/layout":49,"backbone":3,"backbone.marionette":1}],26:[function(require,module,exports){
 var Album, AlbumList, Backbone;
 
 Backbone = require('backbone');
@@ -18542,6 +18549,14 @@ Image = require('../models/image');
 
 ImageList = Backbone.Collection.extend({
   model: Image,
+  initialize: function() {
+    return this.on('add', this.imageAdded);
+  },
+  imageAdded: function() {
+    if (this.length > 9) {
+      return this.pop();
+    }
+  },
   comparator: function(image) {
     return -image.get('id');
   }
@@ -18567,7 +18582,7 @@ Album = Backbone.Model.extend({
   url: '/api/albums',
   defaults: {
     name: "",
-    src: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/300px-No_image_available.svg.png"
+    src: "/assets/img/no_photo.png"
   }
 });
 
@@ -18633,24 +18648,27 @@ AlbumController = Marionette.Object.extend({
   },
   initialize: function(options) {
     this.layout = options.layout;
-    this.albumList = new AlbumListCollection();
-    return this.imageList = new ImageCollection();
+    this.albumList = new AlbumListCollection(prefetch.albums);
+    return this.imageList = new ImageCollection(prefetch.album_images);
   },
   listAlbums: function() {
     this.layout.showChildView('controls', new AlbumListControlsView());
     this.layout.showChildView('content', new AlbumListCollectionView({
       collection: this.albumList
     }));
+    this.layout.hidePagination();
     return this.albumList.fetch();
   },
   showAlbum: function(albumId, page) {
     var url;
-    this.albumId = albumId;
-    this.page = page;
+    page = parseInt(page);
+    this.albumId = parseInt(albumId);
+    this.page = page ? page : 1;
     url = '/api/album/' + albumId;
     if (page) {
       url += '/page/' + page;
     }
+    this.layout.showAlbumPagination(albumId, this.page);
     this.layout.showChildView('controls', new ImageControlsView());
     this.layout.showChildView('content', new ImageCollectionView({
       collection: this.imageList
@@ -18660,6 +18678,7 @@ AlbumController = Marionette.Object.extend({
     return this.imageList.fetch();
   },
   "default": function() {
+    this.layout.hidePagination();
     this.layout.detachChildView('content');
     return this.layout.showChildView('controls', new ErrorPage({
       page: 404
@@ -18685,7 +18704,7 @@ module.exports = {
 };
 
 
-},{"../collections/albumList":26,"../collections/imageList":27,"../views/album_list/collection":41,"../views/album_list/controls":42,"../views/errorPage":43,"../views/image/collection":44,"../views/image/controls":45,"backbone":3,"backbone.marionette":1}],32:[function(require,module,exports){
+},{"../collections/albumList":26,"../collections/imageList":27,"../views/album_list/collection":42,"../views/album_list/controls":43,"../views/errorPage":44,"../views/image/collection":45,"../views/image/controls":46,"backbone":3,"backbone.marionette":1}],32:[function(require,module,exports){
 var templater = require("handlebars/runtime")["default"].template;module.exports = templater({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
 
@@ -18729,9 +18748,75 @@ var templater = require("handlebars/runtime")["default"].template;module.exports
 },"useData":true});
 },{"handlebars/runtime":22}],39:[function(require,module,exports){
 var templater = require("handlebars/runtime")["default"].template;module.exports = templater({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
-    return "<section class=\"header\">\n	<img src=\"/assets/img/logo.png\" alt=\"\"> <h1>payever gallery</h1>\n</section>\n\n<section class=\"controls\"></section>\n<section class=\"content\"></section>";
+    return "<section class=\"header\">\n	<img src=\"/assets/img/logo.png\" alt=\"\"> <h1><a href=\"/\">payever gallery</a></h1>\n</section>\n\n<section class=\"controls\"></section>\n<section class=\"content\"></section>\n<section class=\"pagination\"></section>";
 },"useData":true});
 },{"handlebars/runtime":22}],40:[function(require,module,exports){
+var templater = require("handlebars/runtime")["default"].template;module.exports = templater({"1":function(container,depth0,helpers,partials,data) {
+    var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
+
+  return "	<a class=\"pbtn arrow\" href=\""
+    + alias4(((helper = (helper = helpers.url || (depth0 != null ? depth0.url : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"url","hash":{},"data":data}) : helper)))
+    + alias4(((helper = (helper = helpers.prevp || (depth0 != null ? depth0.prevp : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"prevp","hash":{},"data":data}) : helper)))
+    + "\">&larr;</a>\n";
+},"3":function(container,depth0,helpers,partials,data) {
+    var stack1, helper, alias1=depth0 != null ? depth0 : {};
+
+  return "	<a class=\"pbtn\" href=\""
+    + container.escapeExpression(((helper = (helper = helpers.url || (depth0 != null ? depth0.url : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(alias1,{"name":"url","hash":{},"data":data}) : helper)))
+    + "1\">1</a>\n"
+    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.showStartDots : depth0),{"name":"if","hash":{},"fn":container.program(4, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "");
+},"4":function(container,depth0,helpers,partials,data) {
+    return "		<span class=\"pbtn no-active\">...</span>\n";
+},"6":function(container,depth0,helpers,partials,data,blockParams,depths) {
+    var stack1;
+
+  return ((stack1 = helpers["if"].call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.active : depth0),{"name":"if","hash":{},"fn":container.program(7, data, 0, blockParams, depths),"inverse":container.program(9, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "");
+},"7":function(container,depth0,helpers,partials,data) {
+    var helper;
+
+  return "		<span class=\"pbtn active\">"
+    + container.escapeExpression(((helper = (helper = helpers.num || (depth0 != null ? depth0.num : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : {},{"name":"num","hash":{},"data":data}) : helper)))
+    + "</span>\n";
+},"9":function(container,depth0,helpers,partials,data,blockParams,depths) {
+    var helper, alias1=container.escapeExpression, alias2=depth0 != null ? depth0 : {}, alias3=helpers.helperMissing, alias4="function";
+
+  return "		<a class=\"pbtn\" href=\""
+    + alias1(container.lambda((depths[1] != null ? depths[1].url : depths[1]), depth0))
+    + alias1(((helper = (helper = helpers.num || (depth0 != null ? depth0.num : depth0)) != null ? helper : alias3),(typeof helper === alias4 ? helper.call(alias2,{"name":"num","hash":{},"data":data}) : helper)))
+    + "\">"
+    + alias1(((helper = (helper = helpers.num || (depth0 != null ? depth0.num : depth0)) != null ? helper : alias3),(typeof helper === alias4 ? helper.call(alias2,{"name":"num","hash":{},"data":data}) : helper)))
+    + "</a>\n";
+},"11":function(container,depth0,helpers,partials,data) {
+    var stack1, helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
+
+  return ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.showEndDots : depth0),{"name":"if","hash":{},"fn":container.program(4, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "	<a class=\"pbtn\" href=\""
+    + alias4(((helper = (helper = helpers.url || (depth0 != null ? depth0.url : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"url","hash":{},"data":data}) : helper)))
+    + alias4(((helper = (helper = helpers.count || (depth0 != null ? depth0.count : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"count","hash":{},"data":data}) : helper)))
+    + "\">"
+    + alias4(((helper = (helper = helpers.count || (depth0 != null ? depth0.count : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"count","hash":{},"data":data}) : helper)))
+    + "</a>\n";
+},"13":function(container,depth0,helpers,partials,data) {
+    var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
+
+  return "	<a class=\"pbtn arrow\" href=\""
+    + alias4(((helper = (helper = helpers.url || (depth0 != null ? depth0.url : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"url","hash":{},"data":data}) : helper)))
+    + alias4(((helper = (helper = helpers.nextp || (depth0 != null ? depth0.nextp : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"nextp","hash":{},"data":data}) : helper)))
+    + "\">&rarr;</a>\n";
+},"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data,blockParams,depths) {
+    var stack1, alias1=depth0 != null ? depth0 : {};
+
+  return ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.showLArrow : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "\n"
+    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.showStart : depth0),{"name":"if","hash":{},"fn":container.program(3, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "\n"
+    + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.pages : depth0),{"name":"each","hash":{},"fn":container.program(6, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "\n"
+    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.showEnd : depth0),{"name":"if","hash":{},"fn":container.program(11, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "\n"
+    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.showRArrow : depth0),{"name":"if","hash":{},"fn":container.program(13, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "");
+},"useData":true,"useDepths":true});
+},{"handlebars/runtime":22}],41:[function(require,module,exports){
 var Album, Backbone, Marionette, template;
 
 Marionette = require('backbone.marionette');
@@ -18763,7 +18848,7 @@ Album = Marionette.View.extend({
 module.exports = Album;
 
 
-},{"../../templates/album_list/album.hbs":32,"backbone":3,"backbone.marionette":1}],41:[function(require,module,exports){
+},{"../../templates/album_list/album.hbs":32,"backbone":3,"backbone.marionette":1}],42:[function(require,module,exports){
 var Album, AlbumCollection, Marionette;
 
 Marionette = require('backbone.marionette');
@@ -18777,7 +18862,7 @@ AlbumCollection = Marionette.CollectionView.extend({
 module.exports = AlbumCollection;
 
 
-},{"./album":40,"backbone.marionette":1}],42:[function(require,module,exports){
+},{"./album":41,"backbone.marionette":1}],43:[function(require,module,exports){
 var $, Album, Controls, Marionette, Radio, notifyChannel, template;
 
 $ = require('jquery');
@@ -18826,7 +18911,7 @@ Controls = Marionette.View.extend({
 module.exports = Controls;
 
 
-},{"../../models/album":29,"../../templates/album_list/controls.hbs":33,"backbone.marionette":1,"backbone.radio":2,"jquery":23}],43:[function(require,module,exports){
+},{"../../models/album":29,"../../templates/album_list/controls.hbs":33,"backbone.marionette":1,"backbone.radio":2,"jquery":23}],44:[function(require,module,exports){
 var $, Backbone, E404, E500, ErrorPage, Marionette;
 
 $ = require('jquery');
@@ -18865,7 +18950,7 @@ ErrorPage = Marionette.View.extend({
 module.exports = ErrorPage;
 
 
-},{"../templates/error_pages/404.hbs":34,"../templates/error_pages/500.hbs":35,"backbone":3,"backbone.marionette":1,"jquery":23}],44:[function(require,module,exports){
+},{"../templates/error_pages/404.hbs":34,"../templates/error_pages/500.hbs":35,"backbone":3,"backbone.marionette":1,"jquery":23}],45:[function(require,module,exports){
 var EmptyImageList, Image, ImageCollection, Marionette;
 
 Marionette = require('backbone.marionette');
@@ -18882,7 +18967,7 @@ ImageCollection = Marionette.CollectionView.extend({
 module.exports = ImageCollection;
 
 
-},{"./emptyImageList":46,"./image":47,"backbone.marionette":1}],45:[function(require,module,exports){
+},{"./emptyImageList":47,"./image":48,"backbone.marionette":1}],46:[function(require,module,exports){
 var $, Controls, Image, Marionette, Radio, notifyChannel, template;
 
 $ = require('jquery');
@@ -18945,7 +19030,7 @@ Controls = Marionette.View.extend({
 module.exports = Controls;
 
 
-},{"../../models/image":30,"../../templates/image/controls.hbs":36,"backbone.marionette":1,"backbone.radio":2,"jquery":23}],46:[function(require,module,exports){
+},{"../../models/image":30,"../../templates/image/controls.hbs":36,"backbone.marionette":1,"backbone.radio":2,"jquery":23}],47:[function(require,module,exports){
 var Backbone, EmptyImageList, Marionette, template;
 
 Marionette = require('backbone.marionette');
@@ -18962,7 +19047,7 @@ EmptyImageList = Marionette.View.extend({
 module.exports = EmptyImageList;
 
 
-},{"../../templates/image/emptyImageList.hbs":37,"backbone":3,"backbone.marionette":1}],47:[function(require,module,exports){
+},{"../../templates/image/emptyImageList.hbs":37,"backbone":3,"backbone.marionette":1}],48:[function(require,module,exports){
 var Backbone, Image, Marionette, template;
 
 Marionette = require('backbone.marionette');
@@ -18979,25 +19064,193 @@ Image = Marionette.View.extend({
 module.exports = Image;
 
 
-},{"../../templates/image/image.hbs":38,"backbone":3,"backbone.marionette":1}],48:[function(require,module,exports){
-var Layout, Marionette, template;
+},{"../../templates/image/image.hbs":38,"backbone":3,"backbone.marionette":1}],49:[function(require,module,exports){
+var $, Backbone, IMAGES_ON_PAGE, Layout, Marionette, PaginationView, Radio, notifyChannel, template;
+
+$ = require('jquery');
 
 Marionette = require('backbone.marionette');
 
+Backbone = require('backbone');
+
 template = require('../templates/layout.hbs');
+
+Radio = require('backbone.radio');
+
+notifyChannel = Radio.channel('notify');
+
+PaginationView = require('../views/pagination');
+
+IMAGES_ON_PAGE = 9;
 
 Layout = Marionette.View.extend({
   template: template,
   regions: {
     header: 'section.header',
     controls: 'section.controls',
-    content: 'section.content'
+    content: 'section.content',
+    pagination: 'section.pagination'
+  },
+  ui: {
+    home: 'section.header a'
+  },
+  events: {
+    'click @ui.home': 'goHome'
+  },
+  showAlbumPagination: function(albumId, page) {
+    var pag;
+    if (this.albumId === albumId) {
+      pag = this.getChildView('pagination');
+      return pag.setPage(page);
+    } else {
+      $.ajax({
+        url: '/api/album/' + albumId + '/count',
+        type: 'GET',
+        success: (function(_this) {
+          return function(count, textStatus, jqXHR) {
+            var opt;
+            opt = {
+              page: page,
+              count: count,
+              url: '/album/' + albumId + '/page/',
+              onpage: IMAGES_ON_PAGE
+            };
+            return _this.showChildView('pagination', new PaginationView(opt));
+          };
+        })(this)
+      });
+      return this.albumId = albumId;
+    }
+  },
+  hidePagination: function() {
+    return this.detachChildView('pagination');
+  },
+  goHome: function(event) {
+    var root;
+    root = '/';
+    Backbone.history.navigate(root, {
+      trigger: true
+    });
+    return event.preventDefault();
   }
 });
 
 module.exports = Layout;
 
 
-},{"../templates/layout.hbs":39,"backbone.marionette":1}]},{},[28]);
+},{"../templates/layout.hbs":39,"../views/pagination":50,"backbone":3,"backbone.marionette":1,"backbone.radio":2,"jquery":23}],50:[function(require,module,exports){
+var $, Backbone, Marionette, Pagination, template;
+
+$ = require('jquery');
+
+Marionette = require('backbone.marionette');
+
+Backbone = require('backbone');
+
+template = require('../templates/pagination.hbs');
+
+Pagination = Marionette.View.extend({
+  template: template,
+  channelName: 'notify',
+  radioEvents: {
+    'add:image': 'imageAdded'
+  },
+  events: {
+    'click a': 'redirect'
+  },
+  redirect: function(event) {
+    var a;
+    a = document.createElement('a');
+    a.href = $(event.currentTarget).attr('href');
+    Backbone.history.navigate(a.pathname, {
+      trigger: true
+    });
+    return event.preventDefault();
+  },
+  initialize: function(options) {
+    this.page = parseInt(options.page);
+    this.count = parseInt(options.count);
+    this.url = options.url;
+    return this.onpage = options.onpage;
+  },
+  render: function() {
+    var count, i, max, min, nextp, num, options, pages, prevp, ref, ref1, showEnd, showEndDots, showLArrow, showRArrow, showStart, showStartDots;
+    count = Math.ceil(this.count / this.onpage);
+    if (count <= 1) {
+      this.$el.html("");
+      return;
+    }
+    min = this.page - 2;
+    if (min < 1) {
+      min = 1;
+    }
+    max = this.page + 2;
+    if (max > count) {
+      max = count;
+    }
+    showStart = min === 1 ? false : true;
+    showEnd = max === count ? false : true;
+    showStartDots = min <= 2 ? false : true;
+    showEndDots = max >= count - 1 ? false : true;
+    showLArrow = this.page > 1 ? true : false;
+    showRArrow = this.page < count ? true : false;
+    nextp = this.page + 1;
+    prevp = this.page - 1;
+    pages = [];
+    for (num = i = ref = min, ref1 = max; ref <= ref1 ? i <= ref1 : i >= ref1; num = ref <= ref1 ? ++i : --i) {
+      pages.push({
+        num: num,
+        active: num === this.page ? true : false
+      });
+    }
+    options = {
+      url: this.url,
+      page: this.page,
+      count: count,
+      min: min,
+      max: max,
+      showStart: showStart,
+      showEnd: showEnd,
+      showStartDots: showStartDots,
+      showEndDots: showEndDots,
+      showLArrow: showLArrow,
+      showRArrow: showRArrow,
+      nextp: nextp,
+      prevp: prevp,
+      pages: pages
+    };
+    this.$el.html(this.template(options));
+    return this;
+  },
+  imageAdded: function() {
+    this.count++;
+    return this.render();
+  },
+  incPage: function() {
+    this.page++;
+    return this.render();
+  },
+  decPage: function() {
+    this.page--;
+    return this.render();
+  },
+  setPage: function(page) {
+    var c;
+    if (page < 1) {
+      page = 1;
+    }
+    c = Math.ceil(this.count / this.onpage);
+    if (page > c) {
+      page = c;
+    }
+    this.page = page;
+    return this.render();
+  }
+});
+
+module.exports = Pagination;
+
+
+},{"../templates/pagination.hbs":40,"backbone":3,"backbone.marionette":1,"jquery":23}]},{},[28]);
 
 //# sourceMappingURL=app.js.map

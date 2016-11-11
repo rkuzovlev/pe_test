@@ -4,8 +4,15 @@ AlbumRouter = require('./routers/album')
 Layout = require('./views/layout')
 
 PayeverApp = Marionette.Application.extend
-	region: "#content"
+	region: '#content'
+	channelName: 'notify'
 	
+	radioRequests: 
+		'get:root': 'getRoot'
+
+	getRoot: ()->
+		@root
+
 	onStart: ()->
 		layout = new Layout()
 
@@ -15,12 +22,12 @@ PayeverApp = Marionette.Application.extend
 		@ac = new AlbumRouter.controller layout: layout
 		@ar = new AlbumRouter.router controller: @ac
 
-		# support dev env, not fully suported yet :(
-		root = '/'
+		# dev env not fully suported yet :(
+		@root = '/'
 		if window.location.pathname.indexOf('/app_dev.php') == 0
-			root = "/app_dev.php"
+			@root = "/app_dev.php"
 
-		Backbone.history.start pushState: true, root: root
+		Backbone.history.start pushState: true, root: @root
 
 
 module.exports = new PayeverApp()

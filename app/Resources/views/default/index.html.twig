@@ -1,82 +1,12 @@
 {% extends 'base.html.twig' %}
 
+{# prefetch data for next usage in marionette #}
+{% block prefetch %}
+	{% if prefetch %}
+		window.prefetch = JSON.parse( unescape( '{{ prefetch | prefetch(['list']) | escape('js') }}' ) );
+	{% endif %}
+{% endblock %}
+
 {% block body %}
-{#
-	<section class="header">
-		<img src="/assets/img/logo.png" alt=""> <h1>payever gallery</h1>
-	</section>
-
-	<a ahref="/" href="/">main</a>
-	<a ahref="/album/1" href="/album/1">album 1</a>
-	<a ahref="/album/1/page/1" href="/album/1/page/1">album 1 page 1</a>
-
-	<br />
 	
-	<a href="/#/">main</a>
-	<a href="/#/album/1">album 1</a>
-	<a href="/#/album/1/page/1">album 1 page 1</a>
-
-	<section class="controls">
-		<h3><label for="newAlbumName">Create new album</label></h3>
-		<input id="newAlbumName" class="form-def" type="text" name="album_name" value="" placeholder="Type album name" />
-		<button type="button" class="btn-main">create</button>
-	</section>
-
-	<section class="controls">
-		<input id="upload-img" type="file" name="">
-		<button type="button" class="btn-main">Upload</button> <span>new image</span>
-	</section>
-
-	<section class="content">
-		<div class="album g-lg-4 g-md-4 g-sm-6 g-xs-12">
-			<div class="square-img-cont">
-				<div class="d"></div>
-				<div class="c">
-					<img src="http://magazine.foxnews.com/sites/magazine.foxnews.com/files/styles/700_image/public/petfeather_0.jpg" alt="">
-				</div>
-			</div>
-			<a href="/album/1" class="name">dogs</a>
-		</div>
-
-		<div class="album g-lg-4 g-md-4 g-sm-6 g-xs-12">
-			<div class="square-img-cont">
-				<div class="d"></div>
-				<div class="c">
-					<img src="http://www.warriors.myewebsite.com/img/mid/19/spottedleaf.jpg" alt="">
-				</div>
-			</div>
-			<a href="/album/1" class="name">cats</a>
-		</div>
-
-		<div class="album g-lg-4 g-md-4 g-sm-6 g-xs-12">
-			<div class="square-img-cont">
-				<div class="d"></div>
-				<div class="c">
-					<img src="https://s-media-cache-ak0.pinimg.com/564x/a2/e2/9f/a2e29fb5d8c48a072426326a50f90f5b.jpg" alt="">
-				</div>
-			</div>
-			<a href="/album/1" class="name">dogs</a>
-		</div>
-
-		<div class="album g-lg-4 g-md-4 g-sm-6 g-xs-12">
-			<div class="square-img-cont">
-				<div class="d"></div>
-				<div class="c">
-					<img src="https://s-media-cache-ak0.pinimg.com/736x/3b/d4/9b/3bd49b61a30cf6dad75226501d2d2266.jpg" alt="">
-				</div>
-			</div>
-			<a href="/album/1" class="name">cats</a>
-		</div>
-
-		<div class="album g-lg-4 g-md-4 g-sm-6 g-xs-12">
-			<div class="square-img-cont">
-				<div class="d"></div>
-				<div class="c">
-					<img src="http://m5.paperblog.com/i/46/462574/dogs-and-music-a-harmonious-pair-L-Ctjc8z.jpeg" alt="">
-				</div>
-			</div>
-			<a href="/album/1" class="name">dogs</a>
-		</div>
-	</section>
-#}
 {% endblock %}

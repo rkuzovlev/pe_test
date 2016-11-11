@@ -19,6 +19,14 @@
 
         {% block javascripts %}{% endblock %}
 
+        <script type="text/javascript">
+            window.getPrefetchedData = function(name){
+                return window.prefetch[name]
+            }
+
+            {% block prefetch %}{% endblock %}
+        </script>
+
         <script src="/assets/app.js" type="text/javascript" charset="utf-8"></script>
     </body>
 </html>

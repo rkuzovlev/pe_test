@@ -17,6 +17,21 @@ album_images:
         _method: GET
         albumId: "\d+"
 
+album_images_page:
+    path: /album/{albumId}/page/{page}
+    defaults: { _controller: AppBundle:Images:AlbumImages, _format: json }
+    requirements:
+        _method: GET
+        albumId: "\d+"
+        page: "\d+"
+
+album_images_count:
+    path: /album/{albumId}/count
+    defaults: { _controller: AppBundle:Images:AlbumImagesCount, _format: json }
+    requirements:
+        _method: GET
+        albumId: "\d+"
+
 album_images_upload:
     path: /album/{albumId}
     defaults: { _controller: AppBundle:Images:UploadAlbumImages, _format: json }

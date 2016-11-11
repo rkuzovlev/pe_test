@@ -1,0 +1,29 @@
+{{#if showLArrow}}
+	<a class="pbtn arrow" href="{{ url }}{{ prevp }}">&larr;</a>
+{{/if}}
+
+{{#if showStart}}
+	<a class="pbtn" href="{{ url }}1">1</a>
+	{{#if showStartDots}}
+		<span class="pbtn no-active">...</span>
+	{{/if}}
+{{/if}}
+
+{{#each pages}}
+	{{#if active}}
+		<span class="pbtn active">{{ num }}</span>
+	{{else}}
+		<a class="pbtn" href="{{ ../url }}{{ num }}">{{ num }}</a>
+	{{/if}}
+{{/each}}
+
+{{#if showEnd}}
+	{{#if showEndDots}}
+		<span class="pbtn no-active">...</span>
+	{{/if}}
+	<a class="pbtn" href="{{ url }}{{ count }}">{{ count }}</a>
+{{/if}}
+
+{{#if showRArrow}}
+	<a class="pbtn arrow" href="{{ url }}{{ nextp }}">&rarr;</a>
+{{/if}}

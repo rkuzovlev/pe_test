@@ -1,0 +1,41 @@
+section.pagination {
+	text-align: center;
+	cursor: default;
+
+	.pbtn {
+		text-decoration: none;
+		color: #000;
+		font-size: 16px;
+		padding: 6px 10px;
+		display: inline-block;
+	}
+
+	a.pbtn {
+		cursor: pointer;
+	}
+
+	.active {
+		background-color: #005cb2;
+		border-radius: 3px;
+		color: #fff;
+		cursor: default;
+	}
+
+	.no-active {
+		color: #666;
+	}
+
+	@media (max-width: 500px){
+		.arrow {
+			display: none;
+		}
+		
+		.pbtn {
+			font-size: 14px;
+			padding: 5px 8px;
+		}
+		.no-active {
+			padding: 0px;
+		}
+	}
+}

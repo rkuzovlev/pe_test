@@ -12,3 +12,11 @@ services:
   AlbumService:
     class: AppBundle\Services\AlbumService
     arguments: [ @ImageUploader, @doctrine ]
+
+
+  app.twig_extension:
+    class: AppBundle\Twig\PrefetchExtension
+    public: false
+    arguments: [ @serializer ]
+    tags:
+      - { name: twig.extension }

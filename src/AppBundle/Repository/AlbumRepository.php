@@ -4,6 +4,7 @@ namespace AppBundle\Repository;
 
 use Doctrine\ORM\EntityRepository;
 
+
 /**
  * AlbumRepository
  *
@@ -12,4 +13,34 @@ use Doctrine\ORM\EntityRepository;
  */
 class AlbumRepository extends EntityRepository
 {
+	const MAX_RESULTS_ON_PAGE = 9;
+
+	public function getAlbumImagesWithPage($albumId, $page = 1)
+	{
+		$page -= 1;
+
+		$albumImages = $this->getEntityManager()
+			->createQuery("SELECT i.id, i.src
+		                FROM AppBundle:Image i
+		                WHERE i.album = ?1
+                        ORDER BY i.id DESC
+    				")
+			->setParameter(1, $albumId)
+			->setFirstResult(self::MAX_RESULTS_ON_PAGE * $page)
+			->setMaxResults(self::MAX_RESULTS_ON_PAGE);
+
+		return $albumImages->getResult();
+	}
+
+	public function countImagesCount($albumId)
+	{
+		$count = $this->getEntityManager()
+			->createQuery("SELECT count(i.id)
+		                FROM AppBundle:Image i
+		                WHERE i.album = ?1
+    				")
+			->setParameter(1, $albumId);
+
+		return $count->getSingleScalarResult();
+	}
 }

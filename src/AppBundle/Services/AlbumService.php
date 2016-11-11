@@ -5,8 +5,11 @@ namespace AppBundle\Services;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Filesystem\Filesystem;
+
 use AppBundle\Entity\Album;
 use AppBundle\Entity\Image;
+
+use \Doctrine\Common\Collections\ArrayCollection;
 
 class AlbumService
 {
@@ -49,5 +52,46 @@ class AlbumService
         $em->flush();
 
         return $image;
+	}
+
+	/**
+	 *	Get album images
+	 *
+	 *	@var $album int|Album
+	 *	@var $page int
+	 *
+	 *	@return ArrayCollection|false  -  false when album not found
+	 */
+	public function getAlbumImages($album, $page = 1)
+	{
+		if (!($album instanceof Album)){
+			$album = $this->doctrine
+						->getRepository('AppBundle:Album')
+		        		->findOneById($album);
+		}
+
+	    if (!$album){
+	    	return false;
+	    }
+
+		return $this->doctrine->getRepository('AppBundle:Album')->getAlbumImagesWithPage($album->getId(), $page);
+	}
+
+	/**
+	 *	Get albums
+	 *
+	 *	@return ArrayCollection
+	 */
+	public function getAlbums()
+	{
+		return $this->doctrine
+					->getRepository('AppBundle:Album')
+	        		->findAll();
+	}
+
+	public function getAlbumImagesCount($albumId){
+		return $this->doctrine
+					->getRepository('AppBundle:Album')
+	        		->countImagesCount($albumId);
 	}
 }
